@@ -192,21 +192,48 @@ namespace Modern
 
     void InputManager::GetMouseLookDeltas(float& outDx, float& outDy)
     {
-        outDx = m_accumMouseX * m_analogConfig.sensitivityX;
-        outDy = m_accumMouseY * m_analogConfig.sensitivityY;
+        // Calculate raw deltas for this frame
+        const float rawDx = m_accumMouseX * m_analogConfig.sensitivityX;
+        const float rawDy = m_accumMouseY * m_analogConfig.sensitivityY;
+
+        // Add to smoothing history
+        m_mouseHistory.push_back({ rawDx, rawDy });
+        while (m_mouseHistory.size() > kMouseSmoothFrames)
+        {
+            m_mouseHistory.pop_front();
+        }
+
+        // Average the history to smooth out jitter
+        float avgDx = 0.0f;
+        float avgDy = 0.0f;
+
+        for (const auto& delta : m_mouseHistory)
+        {
+            avgDx += delta.x;
+            avgDy += delta.y;
+        }
+
+        if (!m_mouseHistory.empty())
+        {
+            avgDx /= m_mouseHistory.size();
+            avgDy /= m_mouseHistory.size();
+        }
+
+        outDx = avgDx;
+        outDy = avgDy;
         
-        // ConsumeTriggerRumble(float lowFreq, float highFreq, uint32_t durationMs)
+        // Clear accumulators
+        m_accumMouseX = 0.0f;
+        m_accumMouseY = 0.0f;
+    }
+
+    void InputManager::TriggerRumble(float lowFreq, float highFreq, uint32_t durationMs)
     {
         if (!m_rumbleConfig.enabled)
             return;
             
         float scale = m_rumbleConfig.intensityScale;
         PsyDoom::Input::rumble(lowFreq * scale, highFreq * scale, durationMs);
-    }
-
-    void InputManager::
-        m_accumMouseX = 0.0f;
-        m_accumMouseY = 0.0f;
     }
 
     void InputManager::GenerateTickInputs(TickInputs& outInputs)
