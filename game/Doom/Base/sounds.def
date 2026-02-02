@@ -1,0 +1,746 @@
+# =============================================================================
+# REAPER Sound Definitions
+# =============================================================================
+# 
+# This file defines metadata for custom audio assets that cannot be derived
+# from the waveform alone. Each sound gets:
+#
+#  - loop_start: Sample offset where loop begins (0 = no loop)
+#  - loop_end: Sample offset where loop ends (0 = end of file)
+#  - pitch_variance: Random pitch shift in cents (+/- value, 0 = none)
+#  - reverb_depth: Override reverb amount (0-127, or 255 for map default)
+#  - priority: Voice stealing priority (0-255, higher = more important)
+#
+# Sample rates: 44100 samples = 1 second
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Weapon Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_pistol]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30          # Slight randomization for variety
+reverb_depth = 255           # Use map's reverb setting
+priority = 10
+
+[sfx_shotgn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 10
+
+[sfx_dshtgn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 10
+
+[sfx_plasma]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 80            # Override: plasma has more echo
+priority = 8
+
+[sfx_bfg]
+loop_start = 0
+loop_end = 0
+pitch_variance = 0           # BFG is consistent (iconic sound)
+reverb_depth = 100
+priority = 15
+
+[sfx_rlaunc]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 12
+
+# -----------------------------------------------------------------------------
+# Chainsaw Sounds (Looping)
+# -----------------------------------------------------------------------------
+
+[sfx_sawup]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 60
+priority = 12
+
+[sfx_sawidl]
+loop_start = 8820            # Loop starts at 0.2 seconds
+loop_end = 0                 # Loop to end
+pitch_variance = 0           # No variance for consistent engine sound
+reverb_depth = 50
+priority = 15
+
+[sfx_sawful]
+loop_start = 4410            # Loop starts at 0.1 seconds
+loop_end = 0
+pitch_variance = 5
+reverb_depth = 60
+priority = 14
+
+[sfx_sawhit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 10
+
+# -----------------------------------------------------------------------------
+# Impact & Explosion Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_barexp]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 13
+
+[sfx_firxpl]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 11
+
+[sfx_rxplod]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 100           # BFG explosion has strong reverb
+priority = 14
+
+# -----------------------------------------------------------------------------
+# Player Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_plpain]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40          # Variety in pain sounds
+reverb_depth = 255
+priority = 20                # Player sounds are high priority
+
+[sfx_pldeth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 25                # Death sound must play
+
+[sfx_oof]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 18
+
+[sfx_noway]
+loop_start = 0
+loop_end = 0
+pitch_variance = 0           # Consistent feedback sound
+reverb_depth = 30
+priority = 15
+
+# -----------------------------------------------------------------------------
+# Environment Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_doropn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 255           # Doors use map reverb for realism
+priority = 8
+
+[sfx_dorcls]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 255
+priority = 8
+
+[sfx_bdopn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 255
+priority = 8
+
+[sfx_bdcls]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 255
+priority = 8
+
+[sfx_stnmov]
+loop_start = 4410            # Floor sounds can loop
+loop_end = 0
+pitch_variance = 5
+reverb_depth = 255
+priority = 7
+
+[sfx_pstart]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 9
+
+[sfx_pstop]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 9
+
+[sfx_swtchn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 10
+
+[sfx_swtchx]
+loop_start = 0
+loop_end = 0
+pitch_variance = 0           # Exit switch is distinctive
+reverb_depth = 255
+priority = 15
+
+# -----------------------------------------------------------------------------
+# Pickup Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_itemup]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 60            # Pickups have softer reverb
+priority = 12
+
+[sfx_wpnup]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 60
+priority = 12
+
+[sfx_getpow]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 80
+priority = 13
+
+[sfx_itmbk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 0           # Respawn sound is consistent
+reverb_depth = 70
+priority = 11
+
+# -----------------------------------------------------------------------------
+# Teleport & Special Effects
+# -----------------------------------------------------------------------------
+
+[sfx_telept]
+loop_start = 0
+loop_end = 0
+pitch_variance = 10
+reverb_depth = 120           # Teleports have strong reverb
+priority = 14
+
+# -----------------------------------------------------------------------------
+# Enemy: Former Humans
+# -----------------------------------------------------------------------------
+
+[sfx_posit1]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 9
+
+[sfx_posit2]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 9
+
+[sfx_posit3]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 9
+
+[sfx_podth1]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_podth2]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_podth3]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_posact]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 6
+
+[sfx_popain]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 7
+
+# -----------------------------------------------------------------------------
+# Enemy: Demons
+# -----------------------------------------------------------------------------
+
+[sfx_sgtsit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 10
+
+[sfx_sgtatk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 11
+
+[sfx_sgtdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 9
+
+[sfx_dmpain]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 8
+
+[sfx_dmact]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 7
+
+# -----------------------------------------------------------------------------
+# Enemy: Imps
+# -----------------------------------------------------------------------------
+
+[sfx_bgsit1]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 9
+
+[sfx_bgsit2]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 9
+
+[sfx_bgdth1]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_bgdth2]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_bgact]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 6
+
+# -----------------------------------------------------------------------------
+# Enemy: Barons & Knights
+# -----------------------------------------------------------------------------
+
+[sfx_brssit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 12
+
+[sfx_brsdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 11
+
+[sfx_kntsit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 10
+
+[sfx_kntdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 9
+
+# -----------------------------------------------------------------------------
+# Enemy: Cacodemons & Lost Souls
+# -----------------------------------------------------------------------------
+
+[sfx_cacsit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 10
+
+[sfx_cacdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 9
+
+[sfx_sklatk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 255
+priority = 10
+
+[sfx_skldth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 8
+
+# -----------------------------------------------------------------------------
+# Enemy: Pain Elementals
+# -----------------------------------------------------------------------------
+
+[sfx_pesit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 10
+
+[sfx_pepain]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 8
+
+[sfx_pedth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 9
+
+# -----------------------------------------------------------------------------
+# Enemy: Arachnotrons
+# -----------------------------------------------------------------------------
+
+[sfx_bspsit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 11
+
+[sfx_bspdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 10
+
+[sfx_bspact]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 7
+
+[sfx_bspwlk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 6
+
+# -----------------------------------------------------------------------------
+# Enemy: Mancubi
+# -----------------------------------------------------------------------------
+
+[sfx_mansit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 11
+
+[sfx_manatk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 12
+
+[sfx_mnpain]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 8
+
+[sfx_mandth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 10
+
+# -----------------------------------------------------------------------------
+# Enemy: Revenants
+# -----------------------------------------------------------------------------
+
+[sfx_skesit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 11
+
+[sfx_skedth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 25
+reverb_depth = 255
+priority = 10
+
+[sfx_skeact]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 7
+
+[sfx_skeatk]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 12
+
+[sfx_skeswg]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 10
+
+[sfx_skepch]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 255
+priority = 10
+
+# -----------------------------------------------------------------------------
+# Enemy: Cyberdemons
+# -----------------------------------------------------------------------------
+
+[sfx_cybsit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 15                # Boss sounds are important
+
+[sfx_cybdth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 20
+
+[sfx_hoof]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 10
+
+[sfx_metal]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 10
+
+# -----------------------------------------------------------------------------
+# Enemy: Spider Masterminds
+# -----------------------------------------------------------------------------
+
+[sfx_spisit]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 255
+priority = 15
+
+[sfx_spidth]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 255
+priority = 20
+
+# -----------------------------------------------------------------------------
+# Projectile Sounds
+# -----------------------------------------------------------------------------
+
+[sfx_firsht]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 9
+
+[sfx_firsht2]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 9
+
+# -----------------------------------------------------------------------------
+# Miscellaneous
+# -----------------------------------------------------------------------------
+
+[sfx_punch]
+loop_start = 0
+loop_end = 0
+pitch_variance = 35
+reverb_depth = 40            # Punches don't echo much
+priority = 10
+
+[sfx_claw]
+loop_start = 0
+loop_end = 0
+pitch_variance = 40
+reverb_depth = 60
+priority = 9
+
+[sfx_slop]
+loop_start = 0
+loop_end = 0
+pitch_variance = 30
+reverb_depth = 255
+priority = 8
+
+[sfx_sgcock]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 50
+priority = 10
+
+[sfx_dbopn]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 50
+priority = 10
+
+[sfx_dbload]
+loop_start = 0
+loop_end = 0
+pitch_variance = 20
+reverb_depth = 50
+priority = 10
+
+[sfx_dbcls]
+loop_start = 0
+loop_end = 0
+pitch_variance = 15
+reverb_depth = 50
+priority = 10
+
+# =============================================================================
+# Music Tracks
+# =============================================================================
+
+[music_01]
+loop_start = 441000          # Loop after 10 seconds
+loop_end = 0
+pitch_variance = 0           # No randomization for music
+reverb_depth = 255
+priority = 25                # Music is high priority
+
+[music_02]
+loop_start = 441000
+loop_end = 0
+pitch_variance = 0
+reverb_depth = 255
+priority = 25
+
+[music_03]
+loop_start = 441000
+loop_end = 0
+pitch_variance = 0
+reverb_depth = 255
+priority = 25
+
+# ... Additional music tracks follow same pattern ...
