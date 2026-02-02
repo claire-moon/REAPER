@@ -557,7 +557,7 @@ struct player_t {
         void endianCorrect() noexcept;
     };
 
-    static_assert(sizeof(TickInputs) == 14);
+    static_assert(sizeof(TickInputs) == 14, "TickInputs struct size mismatch");
 
     // Packet sent/received by all players when connecting to a game.
     // Note: a packet containing the settings ('GameSettings') for the game is sent immediately after this by the server.
@@ -574,7 +574,7 @@ struct player_t {
         void endianCorrect() noexcept;
     };
 
-    static_assert(sizeof(NetPacket_Connect) == 20);
+    static_assert(sizeof(NetPacket_Connect) == 20, "NetPacket_Connect struct size mismatch");
 
     // Packet sent/received by all players to share per-tick updates for a network game
     struct NetPacket_Tick {
@@ -588,5 +588,5 @@ struct player_t {
         void endianCorrect() noexcept;
     };
 
-    static_assert(sizeof(NetPacket_Tick) == 26);
+    static_assert(sizeof(NetPacket_Tick) == 26, "NetPacket_Tick struct size mismatch");
 #endif
