@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.13)
 project(DevLauncher)
 
+# Find required packages
+find_package(Threads REQUIRED)
+
 # Glob all sources
 file(GLOB_RECURSE SRC_FILES *.cpp *.h)
 

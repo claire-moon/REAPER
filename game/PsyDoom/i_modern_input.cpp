@@ -294,17 +294,21 @@ namespace Modern
         // Apply turning
         if (std::abs(turn) > 0.001f)
         {
-            // Convert to angle_t
-            // Doom angles: 0 to 0xFFFFFFFF
-            // Map -1.0..1.0 to some angle rate
-            // 1.0f ~= fast turn
-            // Let's say 1.0f is ~4 degrees per tick? (ANG45/10)
-            
-            // Note: TickInputs expects absolute angle change or absolute angle?
-            // "Compressed analog turning amount." "Lower 16-bits chopped off"
-            // Actually TickInputs logic is additive in p_tick usually?
-            // "This is just an 'angle_t' with the lower 16-bits chopped off"
-        
+             // 1 pixel ~= 0.5 degrees
+             constexpr float kAngleScale = 100000000.0f;
+             angle_t angleDelta = (angle_t)(turn * kAngleScale);
+             outInputs.setAnalogTurn(angleDelta);
+        }
+
+        // Apply Pitch (Up/Down)
+        outInputs.lookPitch = 0;
+        if (std::abs(mdy) > 0.001f)
+        {
+            // Scale mdy (pixels * sensitivity) to INT16 pitch units
+            // Map +/- 90 degrees to +/- 16384 approx
+            // 1 pixel ~= 0.5 degrees ~= 100 units
+            outInputs.lookPitch = (int16_t)(mdy * 100.0f);
+        }
     }
 
     // Helper for float to fixed (simple)
