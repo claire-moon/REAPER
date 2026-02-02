@@ -128,7 +128,7 @@ if (PSYDOOM_INCLUDE_REVERSING_TOOLS)
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools/reversing/reversing_common")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools/reversing/vram_dump_getrect")
 endif()
+
 if (PSYDOOM_INCLUDE_DEV_LAUNCHER)
-    add_subdirectory(\
-\/tools/dev_launcher\)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/tools/dev_launcher")
 endif()
