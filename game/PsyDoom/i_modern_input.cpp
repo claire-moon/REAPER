@@ -82,6 +82,11 @@ namespace Modern
         m_analogConfig = config;
     }
 
+    void InputManager::SetRumbleConfig(const RumbleConfig& config)
+    {
+        m_rumbleConfig = config;
+    }
+
     bool InputManager::IsActionHeld(GameAction action) const
     {
         // Check Keyboard
@@ -190,7 +195,16 @@ namespace Modern
         outDx = m_accumMouseX * m_analogConfig.sensitivityX;
         outDy = m_accumMouseY * m_analogConfig.sensitivityY;
         
-        // Consume
+        // ConsumeTriggerRumble(float lowFreq, float highFreq, uint32_t durationMs)
+    {
+        if (!m_rumbleConfig.enabled)
+            return;
+            
+        float scale = m_rumbleConfig.intensityScale;
+        PsyDoom::Input::rumble(lowFreq * scale, highFreq * scale, durationMs);
+    }
+
+    void InputManager::
         m_accumMouseX = 0.0f;
         m_accumMouseY = 0.0f;
     }

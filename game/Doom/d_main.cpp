@@ -23,6 +23,7 @@
 #include "PsyDoom/DemoRecorder.h"
 #include "PsyDoom/Game.h"
 #include "PsyDoom/GameConstants.h"
+#include "PsyDoom/i_modern_input.h" // Modern Input
 #include "PsyDoom/Input.h"
 #include "PsyDoom/IntroLogos.h"
 #include "PsyDoom/MapInfo/MapInfo.h"
@@ -198,9 +199,22 @@ void D_DoomMain() noexcept {
     I_Init();
     W_Init();
     R_Init();
+    
+    // Initialize Modern Input Subsystem
+    Modern::InputManager::GetInstance().Init();
+    
+    // Apply saved preferences to Modern Input
+    Modern::AnalogConfig analogCfg;
+    analogCfg.sensitivityX = PlayerPrefs::gModernSensitivityX;
+    analogCfg.sensitivityY = PlayerPrefs::gModernSensitivityY;
+    analogCfg.invertY = PlayerPrefs::gModernInvertY;
+    Modern::InputManager::GetInstance().SetAnalogConfig(analogCfg);
+    
+    Modern::RumbleConfig rumbleCfg;
+    rumbleCfg.enabled = PlayerPrefs::gModernRumbleEnabled;
+    Modern::InputManager::GetInstance().SetRumbleConfig(rumbleCfg);
 
     // PsyDoom: build the (now) dynamically generated lists of sprites, map objects, animated textures and switches for the game.
-    // User mods can add new entries to any of these lists. Also initialize MAPINFO.
     #if PSYDOOM_MODS
         MapInfo::init();        // Do this first since GEC MAPINFO can affect the base lists of animations and switches
         P_InitSprites();
@@ -214,6 +228,7 @@ void D_DoomMain() noexcept {
     #if PSYDOOM_MODS
         // PsyDoom: new cleanup logic before we exit
         const auto dmainCleanup = finally([]() noexcept {
+            Modern::InputManager::GetInstance().Shutdown();
             MapInfo::shutdown();
             W_Shutdown();
         });
@@ -827,6 +842,10 @@ gameaction_t MiniLoop(
                 // Note: ensure we have the latest input events prior to this with a call to 'Input::update'
                 TickInputs& tickInputs = gTickInputs[gCurPlayerIndex];
                 Input::update();
+                
+                // Update Modern Input Manager (processing raw inputs from previous step)
+                Modern::InputManager::GetInstance().Update();
+                
                 P_GatherTickInputs(tickInputs);
                 gTicButtons = I_ReadGamepad();
             #else

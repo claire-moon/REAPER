@@ -1,0 +1,20 @@
+[
+  {
+    "id": "CYBER_KILL",
+    "title": "Cyberbully",
+    "description": "Defeated the Cyberdemon",
+    "icon": "STKEYS2"
+  },
+  {
+    "id": "FIRST_BLOOD",
+    "title": "First Blood",
+    "description": "Killed your first enemy",
+    "icon": "STKEYS0"
+  },
+  {
+    "id": "DOOM_GUY",
+    "title": "Doom Guy",
+    "description": "You played the game!",
+    "icon": "STFAC0"
+  }
+]

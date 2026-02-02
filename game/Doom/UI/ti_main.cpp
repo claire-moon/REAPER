@@ -19,6 +19,7 @@
 #include "PsyDoom/Game.h"
 #include "PsyDoom/Input.h"
 #include "PsyDoom/MapInfo/MapInfo.h"
+#include "PsyDoom/Overlay/OverlayMain.h"
 #include "PsyDoom/Utils.h"
 #include "PsyDoom/Video.h"
 #include "PsyDoom/Vulkan/VRenderer.h"
@@ -586,6 +587,7 @@ void DRAW_Title() noexcept {
     // PsyDoom: draw any enabled performance counters
     #if PSYDOOM_MODS
         I_DrawEnabledPerfCounters();
+        ReaperOverlay::Render();
     #endif
 
     // Finish up the render

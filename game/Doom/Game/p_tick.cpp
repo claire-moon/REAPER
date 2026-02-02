@@ -27,11 +27,13 @@
 #include "p_user.h"
 #include "PsyDoom/Cheats.h"
 #include "PsyDoom/Config/Config.h"
+#include "PsyDoom/Overlay/OverlayMain.h"
 #include "PsyDoom/Controls.h"
 #include "PsyDoom/DemoPlayer.h"
 #include "PsyDoom/DemoResult.h"
 #include "PsyDoom/DevMapAutoReloader.h"
 #include "PsyDoom/Game.h"
+#include "PsyDoom/i_modern_input.h"
 #include "PsyDoom/Input.h"
 #include "PsyDoom/MapInfo/MapInfo.h"
 #include "PsyDoom/PlayerPrefs.h"
@@ -836,6 +838,7 @@ void P_Drawer() noexcept {
     // PsyDoom: draw any enabled performance counters
     #if PSYDOOM_MODS
         I_DrawEnabledPerfCounters();
+        ReaperOverlay::Render();
     #endif
 
     I_SubmitGpuCmds();
@@ -1012,6 +1015,10 @@ void P_GatherTickInputs(TickInputs& inputs) noexcept {
     inputs.reset();
 
     // Gather basic inputs
+    // Modern Input Integration: Replacing direct Controls:: access for gameplay inputs
+    Modern::InputManager::GetInstance().GenerateTickInputs(inputs);
+
+    /* Legacy Input Gathering (Superseded by Modern::InputManager)
     const float analogForwardMove = (
         Controls::getFloat(Controls::Binding::Analog_MoveForward) -
         Controls::getFloat(Controls::Binding::Analog_MoveBackward)
@@ -1032,12 +1039,16 @@ void P_GatherTickInputs(TickInputs& inputs) noexcept {
     inputs.fStrafeRight() = Controls::getBool(Controls::Binding::Digital_StrafeRight);
     inputs.fUse() = Controls::getBool(Controls::Binding::Action_Use);
     inputs.fAttack() = Controls::getBool(Controls::Binding::Action_Attack);
-    inputs.fRun() = Controls::getBool(Controls::Binding::Modifier_Run);
-    inputs.fStrafe() = Controls::getBool(Controls::Binding::Modifier_Strafe);
     inputs.fPrevWeapon() = Controls::getBool(Controls::Binding::Weapon_Previous);
     inputs.fNextWeapon() = Controls::getBool(Controls::Binding::Weapon_Next);
-    inputs.fTogglePause() = Controls::isJustPressed(Controls::Binding::Toggle_Pause);
     inputs.fToggleMap() = Controls::isJustPressed(Controls::Binding::Toggle_Map);
+    */
+
+    // Retain Modifier/System keys not yet fully mapped or needed for legacy behavior compatibility
+    inputs.fRun() = Controls::getBool(Controls::Binding::Modifier_Run);
+    inputs.fStrafe() = Controls::getBool(Controls::Binding::Modifier_Strafe);
+    
+    inputs.fTogglePause() = Controls::isJustPressed(Controls::Binding::Toggle_Pause);
     inputs.fAutomapZoomIn() = Controls::getBool(Controls::Binding::Automap_ZoomIn);
     inputs.fAutomapZoomOut() = Controls::getBool(Controls::Binding::Automap_ZoomOut);
     inputs.fAutomapMoveLeft() = Controls::getBool(Controls::Binding::Automap_MoveLeft);

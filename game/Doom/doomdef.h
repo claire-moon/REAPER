@@ -233,7 +233,11 @@ struct mobj_t {
     latecall_t      latecall;
     mobj_t*         snext;              // Intrusive fields for the linked list of things in the current sector
     mobj_t*         sprev;
+#if PSYDOOM_MODS
+    InterpAngle     angle;              // Direction the thing is facing in
+#else
     angle_t         angle;              // Direction the thing is facing in
+#endif
     uint32_t        sprite;             // Current sprite displayed
     uint32_t        frame;              // Current sprite frame displayed. Must use 'FF_FRAMEMASK' to get the actual frame number.
     mobj_t*         bnext;              // Linked list of things in this blockmap block

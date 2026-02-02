@@ -144,4 +144,7 @@ float getMouseWheelAxisMovement(const uint8_t axis) noexcept;
 // Other events
 bool isWindowFocusJustLost() noexcept;
 
+// Haptic Feedback
+void rumble(float lowFreq, float highFreq, uint32_t durationMs) noexcept;
+
 END_NAMESPACE(Input)

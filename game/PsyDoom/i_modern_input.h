@@ -55,6 +55,12 @@ namespace Modern
         bool  exponentialCurve = true; // Apply power curve for finer aiming
     };
 
+    struct RumbleConfig
+    {
+        bool enabled = true;
+        float intensityScale = 1.0f;
+    };
+
     // The InputManager class abstracts hardware polling (SDL) into Game Actions.
     // It acts as the bridge between raw OS events and the game simulation (TickInputs).
     class InputManager
@@ -85,6 +91,9 @@ namespace Modern
 
         // Configure Analog Sticks (Hardware abstraction)
         void SetAnalogConfig(const AnalogConfig& config);
+        const AnalogConfig& GetAnalogConfig() const { return m_analogConfig; }
+
+        void SetRumbleConfig(const RumbleConfig& config);
         
         // --------------------------------------------------------------------------
         // State Querying
@@ -113,6 +122,11 @@ namespace Modern
         void GenerateTickInputs(TickInputs& outInputs);
 
         // Consumes accumulated mouse deltas (Freelook)
+        // --------------------------------------------------------------------------
+        // Feedback
+        // --------------------------------------------------------------------------
+        void TriggerRumble(float lowFreq, float highFreq, uint32_t durationMs);
+
         // Returns normalized movement (dx, dy) scaled by sensitivity
         void GetMouseLookDeltas(float& outDx, float& outDy);
 
@@ -128,6 +142,7 @@ namespace Modern
         void  ApplyMouseLook(TickInputs& outInputs);
 
         // Bindings
+        RumbleConfig m_rumbleConfig;
         std::map<uint32_t, GameAction> m_keyBindings;
         std::map<int, GameAction>      m_mouseBindings;
         std::map<GamepadInput, GameAction> m_gamepadBindings;

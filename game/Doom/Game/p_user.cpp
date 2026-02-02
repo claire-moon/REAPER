@@ -34,9 +34,37 @@
 #include "PsyDoom/PsxPadButtons.h"
 #include "PsyDoom/Utils.h"
 
+#include "PsyDoom/i_modern_input.h" // Modern Input
+#include "p_shoot.h" // For P_Shoot2
+#include "p_switch.h" // For P_UseSpecialLine
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+// Modern "Build-Engine" Style Interaction
+// Uses a raycast to find and activate lines directly in front of the player's crosshair.
+//------------------------------------------------------------------------------------------------------------------------------------------
+static void P_UseLinesRaycast(player_t& player) noexcept {
+    // 1. Setup Shooter for Raycast (Reusing P_Shoot2 logic)
+    gpShooter = player.mo;
+    gAttackRange = 128 * FRACUNIT; // Interaction Range
+    gAttackAngle = player.mo->angle;
+    
+    // 2. Perform Raycast
+    // P_Shoot2 sets 'gpShootLine' if a line is hit.
+    P_Shoot2();
+    
+    if (gpShootLine) {
+        // 3. Trigger Line
+        // Determine which side of the line the player is on
+        const int side = P_PointOnLineSide(player.mo->x, player.mo->y, gpShootLine);
+        
+        // Attempt to Use/Activate the line
+        P_UseSpecialLine(gpShootLine, player.mo, side);
+    }
+}
 
 // Accelerating turn speeds: normal (Doom, for 4 vblanks)
 static constexpr fixed_t ANGLE_TURN_DOOM[10] = {
@@ -819,6 +847,11 @@ void P_PlayerThink(player_t& player) noexcept {
 
     // Do weapon switching if the player is still alive (and even if paused)
     if (player.playerstate == PST_LIVE) {
+        // Modern Use Interaction Hook
+        if (Modern::InputManager::GetInstance().CheckUseInteraction()) {
+             P_UseLinesRaycast(player);
+        }
+
         // Get the current weapon being switched to, or the ready weapon if not switching weapons
         const weapontype_t curWeaponType = (player.pendingweapon == wp_nochange) ? player.readyweapon : player.pendingweapon;
 

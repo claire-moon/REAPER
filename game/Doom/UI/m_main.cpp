@@ -16,6 +16,7 @@
 #include "PsyDoom/MapInfo/GecMapInfo.h"
 #include "PsyDoom/MapInfo/MapInfo.h"
 #include "PsyDoom/Network.h"
+#include "PsyDoom/Overlay/OverlayMain.h"
 #include "PsyDoom/PsxPadButtons.h"
 #include "PsyDoom/Utils.h"
 #include "PsyQ/LIBGPU.h"
@@ -985,6 +986,7 @@ void M_Drawer() noexcept {
     // PsyDoom: draw any enabled performance counters
     #if PSYDOOM_MODS
         I_DrawEnabledPerfCounters();
+        ReaperOverlay::Render();
     #endif
 
     // Finish up the frame

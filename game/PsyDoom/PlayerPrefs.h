@@ -38,6 +38,12 @@ extern Password             gLastPassword_Doom;
 extern Password             gLastPassword_FDoom;
 extern Password             gLastPassword_GecMe;
 
+// Modern Input Prefs
+extern float                gModernSensitivityX;
+extern float                gModernSensitivityY;
+extern bool                 gModernInvertY;
+extern bool                 gModernRumbleEnabled;
+
 void setToDefaults() noexcept;
 void load() noexcept;
 void save() noexcept;

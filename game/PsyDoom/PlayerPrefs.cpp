@@ -157,6 +157,11 @@ static void loadPrefsFileIniEntry(const IniUtils::IniEntry& entry) noexcept {
     else if (entry.key == "startupWithVulkanRenderer") {
         gbStartupWithVulkanRenderer = entry.value.tryGetAsBool(gbStartupWithVulkanRenderer);
     }
+    // Modern Input
+    else if (entry.key == "modernSensX") gModernSensitivityX = entry.value.tryGetAsFloat(gModernSensitivityX);
+    else if (entry.key == "modernSensY") gModernSensitivityY = entry.value.tryGetAsFloat(gModernSensitivityY);
+    else if (entry.key == "modernInvertY") gModernInvertY = entry.value.tryGetAsBool(gModernInvertY);
+    else if (entry.key == "modernRumble") gModernRumbleEnabled = entry.value.tryGetAsBool(gModernRumbleEnabled);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -177,6 +182,12 @@ void setToDefaults() noexcept {
     gbAlwaysRun = false;
     gbUncapFramerate = true;
     gStatDisplayMode = StatDisplayMode::None;
+    
+    // Modern Input Defaults
+    gModernSensitivityX = 1.0f;
+    gModernSensitivityY = 1.0f;
+    gModernInvertY = false;
+    gModernRumbleEnabled = true;
 
     // Prefer the Vulkan renderer by default
     gbStartupWithVulkanRenderer = true;
@@ -220,6 +231,12 @@ void save() noexcept {
     std::fprintf(pFile, "lastPassword_Doom = %s\n", getPasswordCString(gLastPassword_Doom).chars);
     std::fprintf(pFile, "lastPassword_FinalDoom = %s\n", getPasswordCString(gLastPassword_FDoom).chars);
     std::fprintf(pFile, "lastPassword_GecMe = %s\n", getPasswordCString(gLastPassword_GecMe).chars);
+    
+    // Modern Input
+    std::fprintf(pFile, "modernSensX = %f\n", gModernSensitivityX);
+    std::fprintf(pFile, "modernSensY = %f\n", gModernSensitivityY);
+    std::fprintf(pFile, "modernInvertY = %d\n", (int)gModernInvertY);
+    std::fprintf(pFile, "modernRumble = %d\n", (int)gModernRumbleEnabled);
     std::fprintf(pFile, "turnSpeedPercentMultiplier = %d\n", gTurnSpeedMult100);
     std::fprintf(pFile, "alwaysRun = %d\n", (int) gbAlwaysRun);
     std::fprintf(pFile, "uncapFramerate = %d\n", (int) gbUncapFramerate);

@@ -939,4 +939,24 @@ bool isWindowFocusJustLost() noexcept {
     return gbWindowFocusJustLost;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+// Triggers haptic feedback (rumble) on the active game controller.
+// lowFreq: Intensity of the low frequency (heavy) motor (0.0 - 1.0)
+// highFreq: Intensity of the high frequency (light) motor (0.0 - 1.0)
+// durationMs: Duration in milliseconds
+//------------------------------------------------------------------------------------------------------------------------------------------
+void rumble(float lowFreq, float highFreq, uint32_t durationMs) noexcept {
+    if (gpGameController) {
+        // Clamp values to 0.0 - 1.0 range just in case
+        lowFreq = std::clamp(lowFreq, 0.0f, 1.0f);
+        highFreq = std::clamp(highFreq, 0.0f, 1.0f);
+        
+        // SDL takes 0-0xFFFF
+        SDL_GameControllerRumble(gpGameController, 
+            (Uint16)(lowFreq * 0xFFFF), 
+            (Uint16)(highFreq * 0xFFFF), 
+            durationMs);
+    }
+}
+
 END_NAMESPACE(Input)
