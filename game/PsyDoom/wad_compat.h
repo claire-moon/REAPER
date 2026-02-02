@@ -68,6 +68,8 @@ public:
 
     void beginMapConversion(const WadFile& mapWad, const WadFormat sourceFormat) noexcept;
 
+    int32_t getConvertedSize(const char* const lumpName, const int32_t sourceSize) const noexcept;
+
     int32_t convertMapLump(
         const char* const lumpName,
         const void* const pSourceData,

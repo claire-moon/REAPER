@@ -10,6 +10,7 @@
 #include "i_main.h"
 #include "PsyDoom/Game.h"
 #include "PsyDoom/ModMgr.h"
+#include "PsyDoom/wad_compat.h"
 #include "PsyDoom/WadList.h"
 
 // A flag set to true once data for the current map has been loaded.
@@ -149,12 +150,17 @@ const WadLump& W_CacheLumpName(const WadLumpName lumpName, const int16_t allocTa
 //------------------------------------------------------------------------------------------------------------------------------------------
 void W_OpenMapWad(const CdFileId fileId) noexcept {
     gMapWad.open(fileId);
+
+    /* Detect WAD format and initialize compatibility layer */
+    const WadCompat::WadFormatInfo info = WadCompat::WadCompatibilityLayer::detectWadFormat(gMapWad);
+    WadCompat::getCompatLayer().beginMapConversion(gMapWad, info.format);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 // Closes the currently open map WAD, if any
 //------------------------------------------------------------------------------------------------------------------------------------------
 void W_CloseMapWad() noexcept {
+    WadCompat::getCompatLayer().endMapConversion();
     gMapWad.close();
 }
 
@@ -185,7 +191,8 @@ int32_t W_MapGetNumForName(const WadLumpName lumpName) noexcept {
 //------------------------------------------------------------------------------------------------------------------------------------------
 int32_t W_MapLumpLength(const int32_t lumpIdx) noexcept {
     const WadLump& lump = gMapWad.getLump(lumpIdx);
-    return lump.uncompressedSize;
+    const WadLumpName name = gMapWad.getLumpName(lumpIdx);
+    return WadCompat::getCompatLayer().getConvertedSize(name.chars, lump.uncompressedSize);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +208,36 @@ int32_t W_RawMapLumpLength(const int32_t lumpIdx) noexcept {
 // The buffer must be big enough to accomodate the data. Optionally, decompression can be disabled.
 //------------------------------------------------------------------------------------------------------------------------------------------
 void W_ReadMapLump(const int32_t lumpIdx, void* const pDest, const bool bDecompress) noexcept {
-    gMapWad.readLump(lumpIdx, pDest, bDecompress);
+    /* If no conversion needed, fast path */
+    if (!WadCompat::getCompatLayer().needsConversion()) {
+        gMapWad.readLump(lumpIdx, pDest, bDecompress);
+        return;
+    }
+
+    /* Allocate temp buffer for raw PC data */
+    const WadLump& lump = gMapWad.getLump(lumpIdx);
+    const int32_t rawSize = lump.uncompressedSize;
+    
+    std::byte* pTemp = (std::byte*)Z_Malloc(rawSize, PU_STATIC, nullptr); 
+    
+    if (!pTemp) {
+        I_Error("W_ReadMapLump: Failed to alloc temp buffer for conversion");
+    }
+
+    gMapWad.readLump(lumpIdx, pTemp, bDecompress);
+    
+    const WadLumpName name = gMapWad.getLumpName(lumpIdx);
+    const int32_t destSize = WadCompat::getCompatLayer().getConvertedSize(name.chars, rawSize);
+    
+    WadCompat::getCompatLayer().convertMapLump(
+        name.chars,
+        pTemp,
+        rawSize,
+        pDest,
+        destSize
+    );
+    
+    Z_Free(pTemp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
