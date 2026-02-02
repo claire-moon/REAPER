@@ -315,6 +315,8 @@ set(SOURCE_FILES
     "PsyDoom/VideoBackend_SDL.h"
     "PsyDoom/VideoSurface_SDL.cpp"
     "PsyDoom/VideoSurface_SDL.h"
+    "PsyDoom/wad_compat.cpp"
+    "PsyDoom/wad_compat.h"
     "PsyDoom/WadFile.cpp"
     "PsyDoom/WadFile.h"
     "PsyDoom/WadList.cpp"
