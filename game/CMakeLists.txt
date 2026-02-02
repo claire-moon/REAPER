@@ -549,6 +549,7 @@ target_link_libraries(${GAME_TGT_NAME}
     ${HASH_LIBRARY_TGT_NAME}
     ${LIBSDL_TGT_NAME}
     ${LUA_TGT_NAME}
+    ${RAPID_JSON_TGT_NAME}
     ${SIMPLE_GPU_TGT_NAME}
     ${SIMPLE_SPU_TGT_NAME}
     ${SOL2_TGT_NAME}

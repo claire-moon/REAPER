@@ -66,6 +66,12 @@ struct sector_t {
     fixed_t         lowerColorZ;        // PsyDoom: the Z value at which the floor sector color applies
     fixed_t         upperColorZ;        // PsyDoom: the Z value at which the ceiling sector color applies
     fixed_t         shadeHeightDiv;     // PsyDoom: a multiplier that divides by 'upperColorZ - lowerColorZ'
+    // [New] Modern Retro Lighting Fields
+    bool            bUseRGB;                    // Enable true RGB lighting (overrides colorid)
+    uint8_t         lightR, lightG, lightB;     // Base Sector RGB
+    bool            bUseGradientRGB;            // Enable separate floor/ceiling colors
+    uint8_t         floorR, floorG, floorB;     // Color at the floor
+    uint8_t         ceilR, ceilG, ceilB;        // Color at the ceiling
     InterpFixedT    floorTexOffsetX;    // PsyDoom: floor texture x offset (can be used to scroll flats)
 #endif
     mobj_t*         thinglist;          // The list of things in the sector; each thing stores next/previous sector thing links

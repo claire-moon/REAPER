@@ -769,6 +769,23 @@ light_t R_GetSectorLightColor(const sector_t& sector, const fixed_t z) noexcept 
     if (!gbDoViewLighting)
         return pLights[0];
 
+    // [New] Modern Retro RGB Support
+    if (sector.bUseRGB) {
+        if (!sector.bUseGradientRGB) {
+            return { sector.lightR, sector.lightG, sector.lightB };
+        } else {
+            // RGB Gradient Interpolation
+            const fixed_t t = std::min((std::max(z - sector.lowerColorZ, 0) >> FRACBITS) * sector.shadeHeightDiv, FRACUNIT);
+            const fixed_t tInv = FRACUNIT - t;
+
+            const uint32_t r = (sector.floorR * tInv + sector.ceilR * t) >> FRACBITS;
+            const uint32_t g = (sector.floorG * tInv + sector.ceilG * t) >> FRACBITS;
+            const uint32_t b = (sector.floorB * tInv + sector.ceilB * t) >> FRACBITS;
+
+            return { (uint8_t)r, (uint8_t)g, (uint8_t)b };
+        }
+    }
+
     // If the floor and ceiling color are the same then just early out and return that - no point in interpolating
     const int16_t lowerColorIdx = sector.colorid;
     const int16_t upperColorIdx = sector.ceilColorid;

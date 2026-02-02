@@ -76,6 +76,9 @@ set(PSYDOOM_INCLUDE_REVERSING_TOOLS FALSE CACHE BOOL
 "If TRUE include reverse engineering tools in the project tree.
 These were tools which were used during the earlier stages of development.")
 
+set(PSYDOOM_INCLUDE_DEV_LAUNCHER TRUE CACHE BOOL
+"If TRUE include the C++ Developer Launcher tool in the project tree.")
+
 set(PSYDOOM_EMIT_MISSING_TEX_WARNINGS FALSE CACHE BOOL
 "Warn when a map uses missing textures? Disabled by default since some original maps can trigger these warnings.
 This feature can be a useful tool for map development however!")
@@ -124,4 +127,8 @@ if (PSYDOOM_INCLUDE_REVERSING_TOOLS)
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools/reversing/psxobj_siggen")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools/reversing/reversing_common")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tools/reversing/vram_dump_getrect")
+endif()
+if (PSYDOOM_INCLUDE_DEV_LAUNCHER)
+    add_subdirectory(\
+\/tools/dev_launcher\)
 endif()

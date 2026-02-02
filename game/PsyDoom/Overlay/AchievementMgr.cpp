@@ -2,14 +2,100 @@
 #include "../../Doom/Base/i_misc.h"
 #include "../../Doom/Base/i_main.h"
 #include "../Game.h"
+#include "FileUtils.h"
+#include "JsonUtils.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include <cstdio>
+#include <vector>
+
+static const char* ACHIEVEMENTS_FILE = "achievements.json";
+static const char* SAVE_FILE = "saved_achievements.json";
 
 void AchievementManager::Init() {
-    // Register hardcoded achievements 
-    // In a real system, these might be loaded from a JSON file
-    m_achievements.push_back({ "CYBER_KILL", "Cyberbully", "Defeated the Cyberdemon", false });
-    m_achievements.push_back({ "FIRST_BLOOD", "First Blood", "Killed your first enemy", false });
-    m_achievements.push_back({ "TEST_ACH", "Test Achievement", "This is a test notification", false });
+    LoadAchievementsData();
+    LoadProgress();
+}
+
+void AchievementManager::LoadAchievementsData() {
+    m_achievements.clear();
+
+    if (!FileUtils::fileExists(ACHIEVEMENTS_FILE)) {
+        // Fallback defaults
+        m_achievements.push_back({ "CYBER_KILL", "Cyberbully", "Defeated the Cyberdemon", "STKEYS2", false });
+        m_achievements.push_back({ "FIRST_BLOOD", "First Blood", "Killed your first enemy", "STKEYS0", false });
+        return;
+    }
+
+    FileData fileData = FileUtils::getContentsOfFile(ACHIEVEMENTS_FILE);
+    if (fileData.size == 0) return;
+
+    std::string jsonStr((const char*)fileData.bytes.get(), fileData.size);
+
+    rapidjson::Document doc;
+    doc.Parse(jsonStr.c_str());
+
+    if (doc.HasParseError() || !doc.IsArray()) {
+        I_Error("Failed to parse achievements.json");
+        return;
+    }
+
+    for (const auto& val : doc.GetArray()) {
+        Achievement ach;
+        ach.id = JsonUtils::getOrDefault<const char*>(val, "id", "UNKNOWN");
+        ach.title = JsonUtils::getOrDefault<const char*>(val, "title", "Untitled");
+        ach.description = JsonUtils::getOrDefault<const char*>(val, "description", "...");
+        ach.icon = JsonUtils::getOrDefault<const char*>(val, "icon", "");
+        ach.unlocked = false;
+        m_achievements.push_back(ach);
+    }
+}
+
+void AchievementManager::LoadProgress() {
+    if (!FileUtils::fileExists(SAVE_FILE)) return;
+
+    FileData fileData = FileUtils::getContentsOfFile(SAVE_FILE);
+    if (fileData.size == 0) return;
+
+    std::string jsonStr((const char*)fileData.bytes.get(), fileData.size);
+
+    rapidjson::Document doc;
+    doc.Parse(jsonStr.c_str());
+
+    if (doc.HasParseError() || !doc.IsArray()) return;
+
+    for (const auto& val : doc.GetArray()) {
+        if (val.IsString()) {
+            std::string id = val.GetString();
+            for (auto& ach : m_achievements) {
+                if (ach.id == id) {
+                    ach.unlocked = true;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void AchievementManager::SaveProgress() {
+    rapidjson::Document doc;
+    doc.SetArray();
+    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+    for (const auto& ach : m_achievements) {
+        if (ach.unlocked) {
+            rapidjson::Value v;
+            v.SetString(ach.id.c_str(), allocator);
+            doc.PushBack(v, allocator);
+        }
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    FileUtils::writeDataToFile(SAVE_FILE, buffer.GetString(), buffer.GetSize());
 }
 
 void AchievementManager::Unlock(const std::string_view id) {
@@ -18,6 +104,7 @@ void AchievementManager::Unlock(const std::string_view id) {
             if (!ach.unlocked) {
                 ach.unlocked = true;
                 m_notificationQueue.push(ach.id);
+                SaveProgress();
             }
             return;
         }
@@ -26,6 +113,10 @@ void AchievementManager::Unlock(const std::string_view id) {
 
 const std::string& AchievementManager::GetCurrentNotificationTitle() const {
     return m_currentNotificationTitle;
+}
+
+const std::string& AchievementManager::GetCurrentNotificationIcon() const {
+    return m_currentNotificationIcon;
 }
 
 void AchievementManager::UpdateAndRender(float deltaTime) {
@@ -38,6 +129,7 @@ void AchievementManager::UpdateAndRender(float deltaTime) {
         for (const auto& a : m_achievements) {
             if (a.id == m_currentNotificationId) {
                 m_currentNotificationTitle = a.title;
+                m_currentNotificationIcon = a.icon;
                 break;
             }
         }
@@ -53,12 +145,7 @@ void AchievementManager::UpdateAndRender(float deltaTime) {
             m_showingNotification = false;
         } else {
             // Draw Notification
-            // TODO: Use a proper box background if possible, or just text for now.
-            // Text render loop or overlay render loop usually happens at the end of frame.
-            
-            // X, Y positions. Let's put it at top center. 
-            // Screen width is typically 320 for PSX Doom.
-            // I_DrawString centers if we calculate width, but simpler to just put it at 10, 10
+            // TODO: Use a proper box background if possible
             
             int32_t xPos = 20;
             int32_t yPos = 20;

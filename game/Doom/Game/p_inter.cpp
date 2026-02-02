@@ -16,6 +16,7 @@
 #include "p_pspr.h"
 #include "p_spec.h"
 #include "PsyDoom/Game.h"
+#include "PsyDoom/Overlay/AchievementMgr.h"
 
 #include <algorithm>
 
@@ -857,6 +858,17 @@ void P_KillMobj(mobj_t* const pKiller, mobj_t& target) noexcept {
         // This is true even for kills caused by other monsters (infighting) and environmental stuff.
         gPlayers[0].killcount += 1;
     }
+
+#if PSYDOOM_MODS
+    // PsyDoom: Achievement hooks
+    if (pKillerPlayer) {
+        AchievementManager::Get().Unlock("FIRST_BLOOD");
+        if (target.type == MT_CYBORG) {
+            AchievementManager::Get().Unlock("CYBER_KILL");
+        }
+    }
+#endif
+
 #if PSYDOOM_MODS
     else if ((gNetGame == gt_coop) && (target.flags & MF_COUNTKILL)) {
         // PsyDoom: in co-op firstly try and credit the kill towards the player which is being targeted by the monster.

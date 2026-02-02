@@ -20,6 +20,7 @@ class VRenderPath_Main;
 BEGIN_NAMESPACE(VPipelines)
 
 extern vgl::Sampler                 gSampler_draw;
+extern vgl::Sampler                 gSampler_SpriteLinear;  // [Modern Retro] Smooth sprites
 extern vgl::Sampler                 gSampler_normClampNearest;
 extern vgl::DescriptorSetLayout     gDescSetLayout_draw;
 extern vgl::DescriptorSetLayout     gDescSetLayout_msaaResolve;

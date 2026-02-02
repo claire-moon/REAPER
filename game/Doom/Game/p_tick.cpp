@@ -905,6 +905,7 @@ void P_Start() noexcept {
     // PsyDoom: start the level timer and auto save if requested
     #if PSYDOOM_MODS
         Game::startLevelTimer();
+        AchievementManager::Get().Unlock("DOOM_GUY");
 
         if (gLevelTimerStartElapsedUsecs != 0) {
             Game::setLevelElapsedTimeMicrosecs(gLevelTimerStartElapsedUsecs);

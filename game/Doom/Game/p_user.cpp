@@ -61,7 +61,7 @@ static void P_UseLinesRaycast(player_t& player) noexcept {
         // Determine which side of the line the player is on
         const int side = P_PointOnLineSide(player.mo->x, player.mo->y, gpShootLine);
         
-        // Attempt to Use/Activate the line
+        // Attempt to Use/Activate the line (use the side that faces the player)
         P_UseSpecialLine(gpShootLine, player.mo, side);
     }
 }
@@ -281,7 +281,7 @@ static void P_PlayerMobjThink(mobj_t& mobj) noexcept {
 
     if (mobj.tics <= 0) {
         // Time to go to the next state: but don't call the state transition function as that's not needed for the player
-        state_t& newState = gStates[mobj.state->nextstate];
+        const state_t& newState = gStates[mobj.state->nextstate];
         mobj.state = &newState;
         mobj.tics = newState.tics;
         mobj.sprite = newState.sprite;

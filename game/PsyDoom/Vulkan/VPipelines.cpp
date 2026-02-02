@@ -91,6 +91,7 @@ vgl::ShaderModule* const gShaders_msaaResolve[] = { &gShader_msaa_resolve_vert, 
 
 // Pipeline samplers
 vgl::Sampler gSampler_draw;
+vgl::Sampler gSampler_SpriteLinear;
 vgl::Sampler gSampler_normClampNearest;
 
 // Pipeline descriptor set layouts
@@ -187,6 +188,22 @@ static void initSamplers(vgl::LogicalDevice& device) noexcept {
         settings.unnormalizedCoordinates = true;    // Note: Vulkan requires min/max lod to be '0' and clamp to edge to be 'true' if using un-normalized coords
 
         if (!gSampler_draw.init(device, settings))
+            FatalErrors::raise("Failed to init a Vulkan sampler!");
+    }
+
+    // [Modern Retro] Smooth sprite sampler (Linear, Normalized UVs)
+    {
+        vgl::SamplerSettings settings = vgl::SamplerSettings().setToDefault();
+        settings.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        settings.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        settings.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        settings.minLod = 0;
+        settings.maxLod = 0;
+        settings.minFilter = VK_FILTER_LINEAR;
+        settings.magFilter = VK_FILTER_LINEAR;
+        settings.unnormalizedCoordinates = false;   // Normalized UVs required for Linear
+
+        if (!gSampler_SpriteLinear.init(device, settings))
             FatalErrors::raise("Failed to init a Vulkan sampler!");
     }
 

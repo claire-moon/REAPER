@@ -9,6 +9,7 @@ struct Achievement {
     std::string id;
     std::string title;
     std::string description;
+    std::string icon;
     bool unlocked;
 };
 
@@ -30,9 +31,14 @@ public:
 
     // Helper to get formatted notification text
     const std::string& GetCurrentNotificationTitle() const;
+    const std::string& GetCurrentNotificationIcon() const;
 
 private:
     AchievementManager() = default;
+
+    void LoadAchievementsData();
+    void LoadProgress();
+    void SaveProgress();
 
     std::vector<Achievement> m_achievements;
     std::queue<std::string> m_notificationQueue;
@@ -41,7 +47,8 @@ private:
     bool m_showingNotification = false;
     float m_notificationTimer = 0.0f;
     std::string m_currentNotificationId;
-    std::string m_currentNotificationTitle; // Cached title for rendering
+    std::string m_currentNotificationTitle; 
+    std::string m_currentNotificationIcon;
     
     // Constants
     static constexpr float NOTIFICATION_DURATION = 5.0f; // Seconds
