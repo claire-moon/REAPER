@@ -276,18 +276,20 @@ public:
 
     static void BuildCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(false); }
     static void CleanCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(true); }
+    static void LaunchCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->LaunchGame(); }
+    static void CloseCB(Fl_Widget*, void* v) { 
+        LauncherWindow* win = (LauncherWindow*)v;
+        win->SaveConfig();
+        win->hide();
     }
 };
 
 int main(int argc, char **argv) {
-    Fl::lock(); // Enable multi-threading supporthreading support
-    Fl::ic void CleanCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(true); }
-    static void LaunchCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->LaunchGame(); }
-};
-
-int main(int argc, char **argv) {
+    Fl::lock(); // Enable multi-threading support
     Fl::scheme("gtk+");
+    
     LauncherWindow *win = new LauncherWindow();
     win->show(argc, argv);
+    
     return Fl::run();
 }

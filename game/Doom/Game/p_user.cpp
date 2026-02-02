@@ -469,6 +469,7 @@ static void P_BuildMove(player_t& player) noexcept {
     }
 
     // Final Doom classic demo playback only: try and do a 'use' action when the mouse is double clicked quickly
+    #if PSYDOOM_MODS
     if (inputs.fPsxMouseUse()) {
         if ((player.psxMouseUseCountdown > 0) && (player.psxMouseUseCountdown < 10)) {
             // Rapid double click with the psx mouse done: try and do a use action and force the user to release the mouse before using again
@@ -482,6 +483,9 @@ static void P_BuildMove(player_t& player) noexcept {
         // Mouse buttons not pressed: reduce the time the player has left to do the double click (or allow initial click again)
         player.psxMouseUseCountdown--;
     }
+    #else
+        player.psxMouseUseCountdown--;
+    #endif
 
     // PsyDoom: apply analog turning movements; this has already been adjusted for framerate, so is applied directly.
     // We ignore the new turning system however when playing back classic demos.
@@ -862,9 +866,11 @@ void P_PlayerThink(player_t& player) noexcept {
     // Do weapon switching if the player is still alive (and even if paused)
     if (player.playerstate == PST_LIVE) {
         // Modern Use Interaction Hook
+        #if PSYDOOM_MODS
         if (Modern::InputManager::GetInstance().CheckUseInteraction()) {
              P_UseLinesRaycast(player);
         }
+        #endif
 
         // Get the current weapon being switched to, or the ready weapon if not switching weapons
         const weapontype_t curWeaponType = (player.pendingweapon == wp_nochange) ? player.readyweapon : player.pendingweapon;
