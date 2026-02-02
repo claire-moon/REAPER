@@ -37,6 +37,13 @@
 #include "PsyDoom/i_modern_input.h" // Modern Input
 #include "p_shoot.h" // For P_Shoot2
 #include "p_switch.h" // For P_UseSpecialLine
+#include "p_maputl.h" // For P_PointOnLineSide
+
+#if !PSYDOOM_MODS
+    #include "Doom/doomdef.h"
+    // Missing declaration for standard build
+    extern padbuttons_t* gpPlayerCtrlBindings[MAXPLAYERS];
+#endif
 
 #include <algorithm>
 #include <chrono>
@@ -46,6 +53,7 @@
 // Modern "Build-Engine" Style Interaction
 // Uses a raycast to find and activate lines directly in front of the player's crosshair.
 //------------------------------------------------------------------------------------------------------------------------------------------
+#if PSYDOOM_MODS
 static void P_UseLinesRaycast(player_t& player) noexcept {
     // 1. Setup Shooter for Raycast (Reusing P_Shoot2 logic)
     gpShooter = player.mo;
@@ -58,13 +66,12 @@ static void P_UseLinesRaycast(player_t& player) noexcept {
     
     if (gpShootLine) {
         // 3. Trigger Line
-        // Determine which side of the line the player is on
-        const int side = P_PointOnLineSide(player.mo->x, player.mo->y, gpShootLine);
-        
-        // Attempt to Use/Activate the line (use the side that faces the player)
-        P_UseSpecialLine(gpShootLine, player.mo, side);
+        // Attempt to Use/Activate the line
+        // Note: New P_UseSpecialLine signature handles side check/activation logic
+        P_UseSpecialLine(*player.mo, *gpShootLine);
     }
 }
+#endif
 
 // Accelerating turn speeds: normal (Doom, for 4 vblanks)
 static constexpr fixed_t ANGLE_TURN_DOOM[10] = {
@@ -282,7 +289,8 @@ static void P_PlayerMobjThink(mobj_t& mobj) noexcept {
     if (mobj.tics <= 0) {
         // Time to go to the next state: but don't call the state transition function as that's not needed for the player
         const state_t& newState = gStates[mobj.state->nextstate];
-        mobj.state = &newState;
+        // Cast needed because gStates is const in non-mod builds but mobj state pointer is not
+        mobj.state = (state_t*) &newState;
         mobj.tics = newState.tics;
         mobj.sprite = newState.sprite;
         mobj.frame = newState.frame;
@@ -375,8 +383,14 @@ static void P_BuildMove(player_t& player) noexcept {
     const int32_t psxMouseSensitivityX = (gPsxMouseSensitivity * 100 * FRACUNIT) / 92;
     const int32_t psxMouseSensitivityY = 3000;
     const int32_t psxMouseTimeScale = (Game::gSettings.bUseFinalDoomPlayerMovement) ? 1 : elapsedVBlanks;
-    const int32_t psxMouseMoveX = inputs.psxMouseDx * psxMouseSensitivityX * psxMouseTimeScale;
-    const int32_t psxMouseMoveY = inputs.psxMouseDy * psxMouseSensitivityY * psxMouseTimeScale;
+
+    #if PSYDOOM_MODS
+        const int32_t psxMouseMoveX = inputs.psxMouseDx * psxMouseSensitivityX * psxMouseTimeScale;
+        const int32_t psxMouseMoveY = inputs.psxMouseDy * psxMouseSensitivityY * psxMouseTimeScale;
+    #else
+        const int32_t psxMouseMoveX = 0;
+        const int32_t psxMouseMoveY = 0;
+    #endif
 
     if (bStrafe) {
         // Strafe button held: turn buttons and x psx mouse movements translate to strafing.

@@ -75,6 +75,7 @@ void TickInputs::byteSwap() noexcept {
     Endian::byteSwapInPlace(_flags5.bits);
     Endian::byteSwapInPlace(psxMouseDx);
     Endian::byteSwapInPlace(psxMouseDy);
+    Endian::byteSwapInPlace(lookPitch);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -235,8 +235,10 @@ struct mobj_t {
     mobj_t*         sprev;
 #if PSYDOOM_MODS
     InterpAngle     angle;              // Direction the thing is facing in
+    fixed_t         pitch;              // PsyDoom: Pitch/Look-angle (fixed point)
 #else
     angle_t         angle;              // Direction the thing is facing in
+    fixed_t         pitch;              // PsyDoom: Pitch/Look-angle (fixed point)
 #endif
     uint32_t        sprite;             // Current sprite displayed
     uint32_t        frame;              // Current sprite frame displayed. Must use 'FF_FRAMEMASK' to get the actual frame number.
@@ -419,6 +421,7 @@ struct player_t {
     mobj_t*         mo;                             // The map object controlled by the player
     playerstate_t   playerstate;                    // Player status
     fixed_t         forwardmove;                    // How much forward movement thrust is to be applied this frame to the player's map object
+    fixed_t         pitchturn;                      // PsyDoom: How much pitch change is to be applied this frame
     fixed_t         sidemove;                       // How much side movement thrust is to be applied this frame to the player's map object
     angle_t         angleturn;                      // How much turning is to be applied this frame to the player's map object
     fixed_t         viewz;                          // The current absolute Z position of the player's view (used for rendering)
@@ -544,6 +547,7 @@ struct player_t {
         // These inputs should always be zeroed in all other cases.
         int8_t psxMouseDx;
         int8_t psxMouseDy;
+int16_t lookPitch; // PsyDoom: Vertical look delta for true mouselook
 
         // Reset the inputs to their defaults (no input)
         void reset() noexcept;
@@ -553,6 +557,7 @@ struct player_t {
         void endianCorrect() noexcept;
     };
 
+    static_assert(sizeof(TickInputs) == 14
     static_assert(sizeof(TickInputs) == 12);
 
     // Packet sent/received by all players when connecting to a game.

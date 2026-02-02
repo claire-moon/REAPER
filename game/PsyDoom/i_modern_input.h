@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
+#include <deque>
 #include <map>
 
 namespace Modern
@@ -152,6 +153,11 @@ namespace Modern
         // Accumulators for mouse frame data
         float m_accumMouseX = 0.0f;
         float m_accumMouseY = 0.0f;
+
+        // Mouse Smoothing History
+        struct MouseDelta { float x; float y; };
+        std::deque<MouseDelta> m_mouseHistory;
+        static constexpr size_t kMouseSmoothFrames = 3;
     };
 
 } // namespace Modern

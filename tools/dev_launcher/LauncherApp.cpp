@@ -214,6 +214,11 @@ public:
             args.push_back(w);
         }
 
+        Log("Launching: " + exe_path);
+        fs::path exe(exe_path);
+        ProcessUtilities::SpawnAsync(exe_path, args, exe.parent_path().string());
+    }
+
     void LoadConfig() {
         if (!FileUtils::fileExists(config_file.c_str())) return;
 
@@ -271,16 +276,11 @@ public:
 
     static void BuildCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(false); }
     static void CleanCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(true); }
-    static void LaunchCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->LaunchGame(); }
-    static void CloseCB(Fl_Widget*, void* v) {
-        LauncherWindow* win = (LauncherWindow*)v;
-        win->SaveConfig();
-        win->hide();
-   
     }
+};
 
-    static void BuildCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(false); }
-    statlock(); // Enable multi-threading support
+int main(int argc, char **argv) {
+    Fl::lock(); // Enable multi-threading supporthreading support
     Fl::ic void CleanCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->RunBuild(true); }
     static void LaunchCB(Fl_Widget*, void* v) { ((LauncherWindow*)v)->LaunchGame(); }
 };
