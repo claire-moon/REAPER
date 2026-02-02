@@ -363,7 +363,7 @@ static texdata_t TC_CacheTexData(const texture_t& tex) {
         pHeader->height = (int16_t)h;
         
         WadCompat::getCompatLayer().generateTexturePixels(pcIdx, (uint8_t*)(pBuf + sizeof(texlump_header_t)));
-        return { pBuf, texSize };
+        return { pBuf, (size_t)texSize };
     }
 
     // Make sure the texture's lump is loaded and get the bytes

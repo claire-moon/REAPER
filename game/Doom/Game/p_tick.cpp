@@ -1019,6 +1019,21 @@ void P_GatherTickInputs(TickInputs& inputs) noexcept {
     // Modern Input Integration: Replacing direct Controls:: access for gameplay inputs
     Modern::InputManager::GetInstance().GenerateTickInputs(inputs);
 
+    // REAPER OVERLAY
+    if (Modern::InputManager::GetInstance().IsJustPressed(Modern::Key::F1)) {
+        OverlayMain::GetInstance().ToggleInteractiveMode();
+    }
+    if (OverlayMain::GetInstance().IsInteractiveMode()) {
+        OverlayMain::GetInstance().HandleInput(inputs);
+        // Suppress gameplay inputs
+        inputs.setAnalogForwardMove(0);
+        inputs.setAnalogSideMove(0);
+        inputs.setAnalogTurn(0);
+        inputs.fAttack() = false;
+        inputs.fUse() = false;
+        inputs.directSwitchToWeapon = (uint8_t)wp_nochange;
+    }
+
     /* Legacy Input Gathering (Superseded by Modern::InputManager)
     const float analogForwardMove = (
         Controls::getFloat(Controls::Binding::Analog_MoveForward) -

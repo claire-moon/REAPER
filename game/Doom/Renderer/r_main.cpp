@@ -34,9 +34,11 @@ fixed_t     gViewX;
 fixed_t     gViewY;
 fixed_t     gViewZ;
 angle_t     gViewAngle;
-fixed_t     gViewCos;
-fixed_t     gViewSin;
-bool        gbIsSkyVisible;
+    fixed_t     gViewPitch;      // PsyDoom: Current view pitch (fixed point)
+    fixed_t     gViewCos;
+    fixed_t     gViewSin;
+    fixed_t     gViewPitchCos;
+    fixed_t     gViewPitchSin;
 MATRIX      gDrawMatrix;
 
 // Light properties
@@ -77,9 +79,7 @@ subsector_t**   gppEndDrawSubsector;    // Used to point to the last draw subsec
     fixed_t     gOldViewY;
     fixed_t     gOldViewZ;
     angle_t     gOldViewAngle;
-    fixed_t     gOldAutomapX;
-    fixed_t     gOldAutomapY;
-    fixed_t     gOldAutomapScale;
+      fixed_t     gOldViewPitch;
     bool        gbSnapViewZInterpolation;
 
     // How much of the current view 'z' value is due to the player being pushed by the world (lifts/crushers etc.).
@@ -163,10 +163,12 @@ void R_RenderPlayerView() noexcept {
         const fixed_t newViewY = playerMobj.y;
         const fixed_t newViewZ = player.viewz;
         const angle_t newViewAngle = playerMobj.angle;
+        const fixed_t newViewPitch = playerMobj.pitch; // PsyDoom: New
         const fixed_t lerp = gPlayerLerpFactor;
 
         if (gbSnapViewZInterpolation) {
             gOldViewZ = newViewZ;
+            gOldViewPitch = newViewPitch; // Snap pitch
             gViewPushedZ = 0;
             gbOldViewZIsPushed = false;
             gbSnapViewZInterpolation = false;
@@ -205,9 +207,11 @@ void R_RenderPlayerView() noexcept {
             } else {
                 gViewAngle = gPlayerNextTickViewAngle + gPlayerUncommittedTurning;
             }
+            gViewPitch = R_LerpCoord(gOldViewPitch, newViewPitch, lerp); // PsyDoom: Interpolate pitch
         } else {
             // User not currently in control: interpolate changes in player view angle
             gViewAngle = R_LerpAngle(gOldViewAngle, newViewAngle, lerp);
+            gViewPitch = R_LerpCoord(gOldViewPitch, newViewPitch, lerp);
         }
     }
     else {
@@ -216,6 +220,7 @@ void R_RenderPlayerView() noexcept {
         gViewY = playerMobj.y & (~FRACMASK);
         gViewZ = player.viewz & (~FRACMASK);
         gViewAngle = playerMobj.angle;
+        gViewPitch = playerMobj.pitch;
     }
 
     // PsyDoom: if the external camera is active the override the player's camera
@@ -225,18 +230,43 @@ void R_RenderPlayerView() noexcept {
             gViewY = gExtCameraY & (~FRACMASK);
             gViewZ = gExtCameraZ & (~FRACMASK);
             gViewAngle = gExtCameraAngle;
+            gViewPitch = 0; // Or add pitch to ext camera if needed
         }
     #endif
 
+    // Precalculate view angle trig
     gViewCos = gFineCosine[gViewAngle >> ANGLETOFINESHIFT];
     gViewSin = gFineSine[gViewAngle >> ANGLETOFINESHIFT];
 
-    // Set the draw matrix and upload to the GTE
-    gDrawMatrix.m[0][0] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( gViewSin);
-    gDrawMatrix.m[0][2] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>(-gViewCos);
-    gDrawMatrix.m[2][0] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( gViewCos);
-    gDrawMatrix.m[2][2] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( gViewSin);
+    // Calculate Cos/Sin for Pitch
+    angle_t pitchAngle = (angle_t)gViewPitch; // Pitch is stored as BAM
+    fixed_t cp = gFineCosine[pitchAngle >> ANGLETOFINESHIFT];
+    fixed_t sp = gFineSine[pitchAngle >> ANGLETOFINESHIFT];
+
+    // Scale pitch intensity?
+    // If pitch > 0 (Look Up), sp > 0.
+    // In GTE math: ViewY is UP.
+    // Forward vector Z component = CosPitch * ...
+    // Up Vector Y component = CosPitch.
+    
+    // Y-Shearing Fix: Apply Pitch Rotation Matrix
+    // Right Vector (Row 0)
+    gDrawMatrix.m[0][0] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( gViewSin );
+    gDrawMatrix.m[0][1] = 0; 
+    gDrawMatrix.m[0][2] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( -gViewCos );
+    
+    // Up Vector (Row 1)
+    gDrawMatrix.m[1][0] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( FixedMul(-gViewCos, sp) ); // -CosYaw * SinPitch
+    gDrawMatrix.m[1][1] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( cp );                     // CosPitch
+    gDrawMatrix.m[1][2] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( FixedMul(-gViewSin, sp) ); // -SinYaw * SinPitch
+
+    // Forward Vector (Row 2) - This determines what is in front of us
+    gDrawMatrix.m[2][0] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( FixedMul(gViewCos, cp) );  // CosYaw * CosPitch
+    gDrawMatrix.m[2][1] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( sp );                      // SinPitch
+    gDrawMatrix.m[2][2] = (int16_t) d_rshift<GTE_ROTFRAC_SHIFT>( FixedMul(gViewSin, cp) );  // SinYaw * CosPitch
+
     LIBGTE_SetRotMatrix(gDrawMatrix);
+
 
     // PsyDoom: increment the marker used to determine when to update the 'draw height' for each sector
     #if PSYDOOM_MODS
@@ -484,6 +514,7 @@ void R_SnapPlayerInterpolation() noexcept {
     gOldViewY = mobj.y;
     gOldViewZ = player.viewz;
     gOldViewAngle = mobj.angle;
+    gOldViewPitch = mobj.pitch; // PsyDoom
     gOldAutomapX = (bAutomapFreeCamera) ? player.automapx : mobj.x;     // Use the current player position if not following to avoid sudden jumps when switching to free camera
     gOldAutomapY = (bAutomapFreeCamera) ? player.automapy : mobj.y;
     gOldAutomapScale = player.automapscale;

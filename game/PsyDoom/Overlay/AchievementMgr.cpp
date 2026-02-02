@@ -1,6 +1,8 @@
 #include "AchievementMgr.h"
 #include "../../Doom/Base/i_misc.h"
 #include "../../Doom/Base/i_main.h"
+#include "../../Doom/Base/s_sound.h"
+#include "../../Doom/Base/sounds.h"
 #include "../Game.h"
 #include "FileUtils.h"
 #include "JsonUtils.h"
@@ -104,6 +106,8 @@ void AchievementManager::Unlock(const std::string_view id) {
             if (!ach.unlocked) {
                 ach.unlocked = true;
                 m_notificationQueue.push(ach.id);
+                // Play achievement sound
+                S_StartSound(nullptr, sfx_getpow);
                 SaveProgress();
             }
             return;

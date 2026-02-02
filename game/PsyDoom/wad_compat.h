@@ -46,20 +46,22 @@ struct ConvertedLump {
 //------------------------------------------------------------------------------------------------------------------------------------------
 // Acts as the middleware for converting PC Doom WAD data into PSX-friendly structures on demand.
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+struct TexturePatch {
+    int16_t originX;
+    int16_t originY;
+    int16_t patchLumpIdx;
+};
+
+struct PCTextureDef {
+    char                    name[8];
+    int16_t                 width;
+    int16_t                 height;
+    std::vector<TexturePatch> patches;
+};
+
 class WadCompatibilityLayer {
 public:
-    struct TexturePatch {
-        int16_t originX;
-        int16_t originY;
-        int16_t patchLumpIdx;
-    };
-
-    struct PCTextureDef {
-        char                    name[8];
-        int16_t                 width;
-        int16_t                 height;
-        std::vector<TexturePatch> patches;
-    };
 
     WadCompatibilityLayer() noexcept;
     ~WadCompatibilityLayer() noexcept;
@@ -172,29 +174,10 @@ private:
         char    name[8];
         int32_t psxIndex;
     };
-    
-    struct TexturePatch {
-        int16_t originX;
-        int16_t originY;
-        int16_t patchIndex;
-        int16_t stepDir;
-        int16_t colormap;
-    };
-
-    struct PCTextureDef {
-        char     name[8];
-        bool     masked;
-        int16_t  width;
-        int16_t  height;
-        int32_t  columndirectory;
-        uint16_t patchCount;
-        std::vector<TexturePatch> patches;
-    };
 
     std::vector<PCTextureDef>                 mPCTextures;
     std::vector<std::string>                  mPCPatchNames;
     const WadFile*                            mMainWad; // Reference to WAD for loading patches
-
 
     std::vector<TextureEntry>                 mTextureRegistry;
     WadFormat                                 mCurrentFormat;

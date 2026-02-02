@@ -12,6 +12,7 @@
 #include "PsyDoom/ModMgr.h"
 #include "PsyDoom/wad_compat.h"
 #include "PsyDoom/WadList.h"
+#include "z_zone.h"
 
 // A flag set to true once data for the current map has been loaded.
 // Has very little purpose anymore in PsyDoom; was originally used to ensure the game was not loading resources on-the-fly off the CD-ROM.

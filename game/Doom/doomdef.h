@@ -547,7 +547,7 @@ struct player_t {
         // These inputs should always be zeroed in all other cases.
         int8_t psxMouseDx;
         int8_t psxMouseDy;
-int16_t lookPitch; // PsyDoom: Vertical look delta for true mouselook
+        int16_t lookPitch; // PsyDoom: Vertical look delta for true mouselook
 
         // Reset the inputs to their defaults (no input)
         void reset() noexcept;
@@ -557,8 +557,7 @@ int16_t lookPitch; // PsyDoom: Vertical look delta for true mouselook
         void endianCorrect() noexcept;
     };
 
-    static_assert(sizeof(TickInputs) == 14
-    static_assert(sizeof(TickInputs) == 12);
+    static_assert(sizeof(TickInputs) == 14);
 
     // Packet sent/received by all players when connecting to a game.
     // Note: a packet containing the settings ('GameSettings') for the game is sent immediately after this by the server.

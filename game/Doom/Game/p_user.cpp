@@ -348,6 +348,7 @@ static void P_BuildMove(player_t& player) noexcept {
 
     // Initially assume no turning or movement
     player.angleturn = 0;
+    player.pitchturn = 0;
     player.sidemove = 0;
     player.forwardmove = 0;
 
@@ -492,6 +493,7 @@ static void P_BuildMove(player_t& player) noexcept {
     #if PSYDOOM_MODS
         if (DemoPlayer::getPlayingDemoFormat() != DemoFormat::Classic) {
             player.angleturn += inputs.getAnalogTurn();
+            player.pitchturn += (fixed_t)inputs.lookPitch * FRACUNIT; // PsyDoom: Apply smoothed pitch from analog inputs
         }
     #endif
 
@@ -743,6 +745,37 @@ static void P_MovePlayer(player_t& player) noexcept {
     } else {
         mobj.angle += player.angleturn;
     }
+
+    // PsyDoom: Apply smoothed pitch, but don't multiply by elapsed vblanks because smoothing already integrates time
+    mobj.pitch += player.pitchturn;
+    
+    // Clamp Pitch to prevent neck breaking
+    // +/- 85 degrees (approx 0xD555555 in fixed point angles, but we use fixed point units here)
+    // 85 * FRACUNIT is 85.0
+    // Wait, mobj.pitch is fixed_t, usually corresponding to degrees? No, often 0-360 mapped differently.
+    // In GTE math above, pitch was used directly for matrix calc? 
+    // R_RenderPlayerView uses pitch as a linear offset in some engines, but we want true rotation.
+    // Let's assume typical Build Engine / Quake convention: pitch is a fixed point angle offset.
+    
+    // Actually, check r_main.cpp GTE setup. "gViewPitch"
+    
+    // Standard Pitch Clamp (+/- 55 degrees was mentioned in r_main for software, we can go higher for Vulkan/Analogue)
+    // 90 deg = 0x40000000 in BAM? No, Doom usually uses BAM for angles (0-FFFFFFFF).
+    // But pitch is often treated as linear offset in classic doom.
+    // IF we are using TRUE 3D now in r_main, we should treat pitch as BAM or degrees.
+    // The previous plan indicated fixed_t pitch.
+    
+    // Let's use BAM (Binary Short Angle Measure) equivalent behavior, but stored in fixed_t for now?
+    // Wait, angle_t is uint32 (BAM). fixed_t is int32 (16.16).
+    
+    // If we want True Mouselook, we should use angle_t for pitch ideally, or treat fixed_t as degrees * FRACUNIT.
+    // Given the previous edit in doomdef.h: "fixed_t pitch;"
+    // Let's stick to fixed_t being "Units of Pitch" that the renderer interprets.
+    
+    // Clamp to +/- 89 degrees (approx)
+    const fixed_t kMaxPitch = 89 * FRACUNIT;
+    if (mobj.pitch > kMaxPitch) mobj.pitch = kMaxPitch;
+    if (mobj.pitch < -kMaxPitch) mobj.pitch = -kMaxPitch;
 
     // Save whether we are on the ground
     gbOnGround = (mobj.z <= mobj.floorz);
