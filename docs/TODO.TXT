@@ -1,0 +1,30 @@
+REAPER Development TODO
+=======================
+
+COMPLETED:
+----------
+[X] Rewrite README.md to reflect REAPER project goals and name (2026-02-02)
+
+IN PROGRESS:
+-----------
+
+TODO:
+-----
+[ ] Replace PsyDoom branding in code comments and headers
+[ ] Create initial REAPER custom assets (sprites, textures, audio)
+[ ] Design and implement first custom level
+[ ] Update CMakeLists.txt project name from PsyDoom to REAPER
+[ ] Create REAPER-specific launcher UI
+[ ] Document asset creation pipeline
+[ ] Establish coding standards for REAPER-specific code
+[ ] Set up asset management system
+
+FUTURE:
+-------
+[ ] Multiplayer testing and refinement
+[ ] Performance optimization for custom assets
+[ ] Additional custom levels
+[ ] Custom enemy types
+[ ] Custom weapons
+[ ] Story/narrative elements
+[ ] Audio mixing and mastering
