@@ -200,15 +200,25 @@ static void R_InitTextures() noexcept {
     // Note: could write specialized code to do this more efficiently but not it's not worth the effort, just re-use the 'for each' helper.
     const WadLumpName ln_T_START = WadUtils::makeUppercaseLumpName("T_START");
     const WadLumpName ln_T_END = WadUtils::makeUppercaseLumpName("T_END");
-    gNumTexLumps = 0;
+    int32_t numWadTextures = 0;
 
     forEachLumpList(
         ln_T_START,
         ln_T_END,
-        []([[maybe_unused]] const int32_t lumpIdx) noexcept {
-            gNumTexLumps++;
+        [&]([[maybe_unused]] const int32_t lumpIdx) noexcept {
+            numWadTextures++;
         }
     );
+    
+    // Load PC Texture Definitions
+    auto& compat = WadCompat::getCompatLayer();
+    if (gpWadFile) {
+        compat.loadPCTextureDefinitions(*gpWadFile);
+    }
+    const int32_t numPCTextures = compat.getTextureCount();
+    
+    // Total count
+    gNumTexLumps = numWadTextures + numPCTextures;
 
     // Alloc and zero init the list of textures and the texture translation table
     {
@@ -234,6 +244,15 @@ static void R_InitTextures() noexcept {
                 ++texIdx;
             }
         );
+        
+        // Initialize PC textures (Virtual)
+        for (int32_t i = 0; i < numPCTextures; ++i) {
+            texture_t& tex = gpTextures[numWadTextures + i];
+            tex.lumpNum = (uint16_t)(0x8000 | i);
+            tex.width = (int16_t)compat.getTextureWidth(i);
+            tex.height = (int16_t)compat.getTextureHeight(i);
+            // Note: No entry in gpLumpToTex for virtual textures
+        }
     }
 
     // Init the texture translation table: initially all textures translate to themselves
@@ -353,8 +372,20 @@ int32_t R_TextureNumForName(const char* const name, const bool bMustExist) noexc
 
     // Note: iterate backwards, since the highest precedence WADS will have their lumps last in the list
     for (int32_t texIdx = numTextures - 1; texIdx >= 0; --texIdx) {
-        const int32_t texLumpIdx = pTextures[texIdx].lumpNum;
-        const WadLumpName texLumpName = W_GetLumpName(texLumpIdx);
+        const uint16_t lumpNum = pTextures[texIdx].lumpNum;
+        WadLumpName texLumpName;
+
+        if (lumpNum & 0x8000) {
+            // PC Compatibility: Virtual Lump
+            const int32_t pcIdx = lumpNum & 0x7FFF;
+            const auto& def = WadCompat::getCompatLayer().getPCTextureDef(pcIdx);
+            // Copy name safely
+            std::memset(texLumpName.chars, 0, 8);
+            std::memcpy(texLumpName.chars, def.name, 8);
+        } else {
+            // Standard PSX Lump
+            texLumpName = W_GetLumpName(lumpNum);
+        }
 
         if ((texLumpName.word() & WAD_LUMPNAME_MASK) == searchLumpName.word())
             return texIdx;

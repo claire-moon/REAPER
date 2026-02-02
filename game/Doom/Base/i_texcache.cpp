@@ -61,6 +61,7 @@
 #include "PsyDoom/Vulkan/VDrawing.h"
 #include "PsyDoom/Vulkan/VPipelines.h"
 #include "PsyDoom/Vulkan/VRenderer.h"
+#include "PsyDoom/wad_compat.h"
 #include "PsyQ/LIBGPU.h"
 #include "w_wad.h"
 #include "z_zone.h"
@@ -337,6 +338,34 @@ static void TC_FillCacheCells(tcachepage_t& texPage, texture_t& tex) noexcept {
 // Caches and decompresses the data for the specified texture and returns the pointer to the texture bytes and its size
 //------------------------------------------------------------------------------------------------------------------------------------------
 static texdata_t TC_CacheTexData(const texture_t& tex) {
+    // NEW: Handle PC Virtual Textures (Phase 1C)
+    if (tex.lumpNum & 0x8000) {
+        const int32_t pcIdx = tex.lumpNum & 0x7FFF;
+        
+        const int32_t w = WadCompat::getCompatLayer().getTextureWidth(pcIdx);
+        const int32_t h = WadCompat::getCompatLayer().getTextureHeight(pcIdx);
+        const int32_t texSize = sizeof(texlump_header_t) + (w * h);
+
+        #if PSYDOOM_LIMIT_REMOVING
+            gTmpBuffer.ensureSize(texSize);
+            std::byte* pBuf = gTmpBuffer.bytes();
+        #else
+            if (texSize > TMP_BUFFER_SIZE) {
+                I_Error("TC_CacheTexData: PC Texture too big (%d)", texSize);
+            }
+            std::byte* pBuf = gTmpBuffer;
+        #endif
+        
+        texlump_header_t* pHeader = reinterpret_cast<texlump_header_t*>(pBuf);
+        pHeader->offsetX = 0;
+        pHeader->offsetY = 0;
+        pHeader->width = (int16_t)w;
+        pHeader->height = (int16_t)h;
+        
+        WadCompat::getCompatLayer().generateTexturePixels(pcIdx, (uint8_t*)(pBuf + sizeof(texlump_header_t)));
+        return { pBuf, texSize };
+    }
+
     // Make sure the texture's lump is loaded and get the bytes
     const WadLump& texLump = W_CacheLumpNum(tex.lumpNum, PU_CACHE, false);
     std::byte* pTexBytes = (std::byte*) texLump.pCachedData;

@@ -99,6 +99,9 @@ public:
     void buildTextureRegistry() noexcept;
     int32_t resolveTextureName(const char name[8]) const noexcept;
 
+    void loadPCTextureDefinitions(const WadFile& mainWad) noexcept;
+    void generateTexturePixels(const int32_t pcTextureIndex, uint8_t* const pPixels) noexcept;
+
     //--------------------------------------------------------------------------------------------------------------------------------------
     // Texture System (Phase 1C)
     //--------------------------------------------------------------------------------------------------------------------------------------
@@ -132,17 +135,66 @@ public:
         return (mCurrentFormat == WadFormat::PC_Doom);
     }
 
+    inline int32_t getTextureCount() const noexcept {
+        return (int32_t)mPCTextures.size();
+    }
+    
+    inline const char* getTextureName(const int32_t index) const noexcept {
+        if (index >= 0 && index < (int32_t)mPCTextures.size()) {
+            return mPCTextures[index].name;
+        }
+        return "?";
+    }
+
+    inline int32_t getTextureWidth(const int32_t index) const noexcept {
+        if (index >= 0 && index < (int32_t)mPCTextures.size()) {
+            return mPCTextures[index].width;
+        }
+        return 0;
+    }
+    
+    inline int32_t getTextureHeight(const int32_t index) const noexcept {
+        if (index >= 0 && index < (int32_t)mPCTextures.size()) {
+            return mPCTextures[index].height;
+        }
+        return 0;
+    }
+
 private:
 
     void convertVertices_PCToPSX(const void* const pSource, void* const pDest, const int32_t count) noexcept;
     void convertSectors_PCToPSX(const void* const pSource, void* const pDest, const int32_t count) noexcept;
     void convertSidedefs_PCToPSX(const void* const pSource, void* const pDest, const int32_t count) noexcept;
     void convertLinedefs_PCToPSX(const void* const pSource, void* const pDest, const int32_t count) noexcept;
+    void ConvertPCTexturesToPSX(const WadFile& wadFile) noexcept;
 
     struct TextureEntry {
         char    name[8];
         int32_t psxIndex;
     };
+    
+    struct TexturePatch {
+        int16_t originX;
+        int16_t originY;
+        int16_t patchIndex;
+        int16_t stepDir;
+        int16_t colormap;
+    };
+
+    struct PCTextureDef {
+        char     name[8];
+        bool     masked;
+        int16_t  width;
+        int16_t  height;
+        int32_t  columndirectory;
+        uint16_t patchCount;
+        std::vector<TexturePatch> patches;
+    };
+
+    std::vector<PCTextureDef>                 mPCTextures;
+    std::vector<std::string>                  mPCPatchNames;
+    const WadFile*                            mMainWad; // Reference to WAD for loading patches
+
 
     std::vector<TextureEntry>                 mTextureRegistry;
     WadFormat                                 mCurrentFormat;
