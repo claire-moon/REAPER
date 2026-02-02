@@ -5,6 +5,7 @@
 #include "Doom/Base/z_zone.h"
 #include "Doom/Game/doomdata.h"
 #include "PsyDoom/Game.h"
+#include "PsyDoom/wad_compat.h"
 #include "PsyQ/LIBGPU.h"
 
 #include <cstring>
@@ -156,6 +157,45 @@ static void forEachLumpList(
 // PsyDoom: this function has been re-written, see the 'Old' code folder for the original version.
 //------------------------------------------------------------------------------------------------------------------------------------------
 static void R_InitTextures() noexcept {
+    // NEW: Check if we are loading PC textures (Phase 1C)
+    if (WadCompat::getCompatLayer().loadPCTextureDefinitions()) {
+        const int32_t numTextures = WadCompat::getCompatLayer().getNumPCTextures();
+        gNumTexLumps = numTextures;
+
+        // Alloc and zero init the list of textures and the texture translation table
+        {
+            const int32_t allocSize = gNumTexLumps * (int32_t)(sizeof(texture_t) + sizeof(int32_t));
+            std::byte* const pAlloc = (std::byte*) Z_Malloc(*gpMainMemZone, allocSize, PU_STATIC, nullptr);
+            std::memset(pAlloc, 0, allocSize);
+
+            gpTextures = (texture_t*) pAlloc;
+            gpTextureTranslation = (int32_t*)(pAlloc + gNumTexLumps * sizeof(texture_t));
+        }
+
+        // Populate texture definitions
+        for (int32_t i = 0; i < numTextures; i++) {
+            const auto& def = WadCompat::getCompatLayer().getPCTextureDef(i);
+            texture_t& tex = gpTextures[i];
+
+            tex.lumpNum = (uint16_t)(i | 0x8000); // Flag as PC texture (Virtual Lump)
+            
+            // Dimensions
+            tex.width = def.width;
+            tex.height = def.height;
+            tex.width16 = (uint8_t)((tex.width + 15) / 16);
+            tex.height16 = (uint8_t)((tex.height + 15) / 16);
+            
+            // Note: gpLumpToTex unimplemented for virtual lumps (index out of range)
+        }
+
+        // Init the texture translation table
+        for (int32_t texIdx = 0; texIdx < gNumTexLumps; ++texIdx) {
+            gpTextureTranslation[texIdx] = texIdx;
+        }
+
+        return; // Done
+    }
+
     // Count the number of textures overall in the game.
     // Note: could write specialized code to do this more efficiently but not it's not worth the effort, just re-use the 'for each' helper.
     const WadLumpName ln_T_START = WadUtils::makeUppercaseLumpName("T_START");

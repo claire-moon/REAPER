@@ -48,6 +48,18 @@ struct ConvertedLump {
 //------------------------------------------------------------------------------------------------------------------------------------------
 class WadCompatibilityLayer {
 public:
+    struct TexturePatch {
+        int16_t originX;
+        int16_t originY;
+        int16_t patchLumpIdx;
+    };
+
+    struct PCTextureDef {
+        char                    name[8];
+        int16_t                 width;
+        int16_t                 height;
+        std::vector<TexturePatch> patches;
+    };
 
     WadCompatibilityLayer() noexcept;
     ~WadCompatibilityLayer() noexcept;
@@ -86,6 +98,27 @@ public:
     int32_t resolveTextureName(const char name[8]) const noexcept;
 
     //--------------------------------------------------------------------------------------------------------------------------------------
+    // Texture System (Phase 1C)
+    //--------------------------------------------------------------------------------------------------------------------------------------
+    
+    // Loads PC texture definitions from TEXTURE1/2 and PNAMES
+    // Populates internal storage and returns true if successful.
+    // Uses global W_ functions to access loaded WADs.
+    bool loadPCTextureDefinitions() noexcept;
+    
+    // Generates pixel data for a PC texture (composites patches)
+    // Returns the size of data written.
+    int32_t generateTexturePixels(const int32_t pcTextureIdx, void* const pDestBuffer) noexcept;
+
+    inline int32_t getNumPCTextures() const noexcept {
+        return (int32_t)mPCTextureDefs.size();
+    }
+
+    inline const PCTextureDef& getPCTextureDef(const int32_t idx) const noexcept {
+        return mPCTextureDefs[idx];
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------------------
     // Accessors
     //--------------------------------------------------------------------------------------------------------------------------------------
 
@@ -112,6 +145,10 @@ private:
     std::vector<TextureEntry>                 mTextureRegistry;
     WadFormat                                 mCurrentFormat;
     std::unordered_map<std::string, ConvertedLump> mConvertedLumps;
+
+    // PC Texture Data
+    std::vector<PCTextureDef>                 mPCTextureDefs;
+    std::vector<int32_t>                      mPatchLumpIndices; // From PNAMES
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
