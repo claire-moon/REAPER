@@ -219,7 +219,7 @@ void W_ReadMapLump(const int32_t lumpIdx, void* const pDest, const bool bDecompr
     const WadLump& lump = gMapWad.getLump(lumpIdx);
     const int32_t rawSize = lump.uncompressedSize;
     
-    std::byte* pTemp = (std::byte*)Z_Malloc(rawSize, PU_STATIC, nullptr); 
+    std::byte* pTemp = (std::byte*)Z_Malloc(*gpMainMemZone, rawSize, PU_STATIC, nullptr); 
     
     if (!pTemp) {
         I_Error("W_ReadMapLump: Failed to alloc temp buffer for conversion");
@@ -238,7 +238,7 @@ void W_ReadMapLump(const int32_t lumpIdx, void* const pDest, const bool bDecompr
         destSize
     );
     
-    Z_Free(pTemp);
+    Z_Free2(*gpMainMemZone, pTemp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

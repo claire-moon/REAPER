@@ -47,21 +47,22 @@ struct ConvertedLump {
 // Acts as the middleware for converting PC Doom WAD data into PSX-friendly structures on demand.
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-struct TexturePatch {
-    int16_t originX;
-    int16_t originY;
-    int16_t patchLumpIdx;
-};
-
-struct PCTextureDef {
-    char                    name[8];
-    int16_t                 width;
-    int16_t                 height;
-    std::vector<TexturePatch> patches;
-};
-
 class WadCompatibilityLayer {
 public:
+
+    /* Nested struct definitions for texture patches and definitions */
+    struct TexturePatch {
+        int16_t originX;
+        int16_t originY;
+        int16_t patchLumpIdx;
+    };
+
+    struct PCTextureDef {
+        char                    name[8];
+        int16_t                 width;
+        int16_t                 height;
+        std::vector<TexturePatch> patches;
+    };
 
     WadCompatibilityLayer() noexcept;
     ~WadCompatibilityLayer() noexcept;

@@ -588,5 +588,5 @@ struct player_t {
         void endianCorrect() noexcept;
     };
 
-    static_assert(sizeof(NetPacket_Tick) == 24);
+    static_assert(sizeof(NetPacket_Tick) == 26);
 #endif
